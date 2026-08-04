@@ -1,94 +1,376 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ایتی مکس | آموزش زبان ایتی</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            font-family: Tahoma, sans-serif;
-            margin: 0;
-            background: #f2f2f2;
-            text-align: center;
-        }
+<title>ایتی مکس | آموزش زبان ایتی</title>
 
-        header {
-            background: #2563eb;
-            color: white;
-            padding: 50px 20px;
-        }
+<style>
 
-        header h1 {
-            font-size: 40px;
-        }
+body {
+    font-family: Tahoma, sans-serif;
+    margin: 0;
+    background: #f2f2f2;
+    text-align: center;
+}
 
-        .box {
-            background: white;
-            margin: 25px;
-            padding: 25px;
-            border-radius: 15px;
-        }
+header {
+    background: #2563eb;
+    color: white;
+    padding: 50px 20px;
+}
 
-        .button {
-            display: inline-block;
-            background: #2563eb;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 8px;
-            text-decoration: none;
-            margin-top: 15px;
-        }
+header h1 {
+    font-size: 40px;
+}
 
-        .button:hover {
-            background: #1e40af;
-        }
-    </style>
+.box {
+    background: white;
+    margin: 25px;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+button, .button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    margin: 10px;
+    font-size: 16px;
+}
+
+button:hover, .button:hover {
+    background: #1e40af;
+}
+
+
+/* پنجره انتخاب دستگاه */
+
+#deviceBox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    padding-top: 120px;
+}
+
+.popup {
+    background: white;
+    width: 300px;
+    margin: auto;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+</style>
+
 </head>
+
 
 <body>
 
+
 <header>
-    <h1>ایتی مکس</h1>
-    <p>آموزش ساخت زبان ایتی</p>
+
+<h1>ایتی مکس</h1>
+
+<p>
+آموزش ساخت زبان ایتی
+</p>
+
 </header>
 
 
+
 <div class="box">
-    <h2>به ایتی مکس خوش آمدید</h2>
 
-    <p>
-        ما اینجا به شما رایگان یاد می‌دهیم
-        که زبان ایتی را چگونه یاد بگیرید.
-    </p>
+<h2>به ایتی مکس خوش آمدید</h2>
 
-    <a class="button" href="https://eitaa.com/I_T_MAX">
-        شروع آموزش
-    </a>
+<p>
+ما اینجا به شما رایگان یاد می‌دهیم
+که زبان ایتی را چگونه یاد بگیرید.
+</p>
+
+
+<button onclick="showDevice()">
+شروع آموزش
+</button>
+
+
 </div>
 
 
-<div class="box">
-    <h2>درباره ما</h2>
 
-    <p>
-        در ایتی مکس آموزش‌های ساده و کاربردی
-        برای یادگیری زبان ایتی ارائه می‌شود.
-    </p>
+<div class="box">
+
+<h2>درباره ما</h2>
+
+<p>
+در ایتی مکس آموزش‌های ساده و کاربردی
+برای یادگیری زبان ایتی ارائه می‌شود.
+</p>
+
 </div>
 
 
+
 <div class="box">
-    <h2>ارتباط با ما</h2>
 
-    <p>
-        برای دریافت آموزش‌ها وارد کانال ایتای ما شوید.
-    </p>
+<h2>ارتباط با ما</h2>
 
-    <a class="button" href="https://eitaa.com/I_T_MAX">
-        ورود به ایتا
-    </a>
+<p>
+برای دریافت آموزش‌ها وارد کانال ایتای ما شوید.
+</p>
+
+<a class="button" href="https://eitaa.com/I_T_MAX">
+ورود به ایتا
+</a>
+
 </div>
+
+
+
+
+<!-- پنجره انتخاب دستگاه -->
+
+<div id="deviceBox">
+
+<div class="popup">
+
+<h2>
+با چه دستگاهی هستید؟
+</h2>
+
+
+<button onclick="goEitaa()">
+📱 گوشی
+</button>
+
+
+<button onclick="goEitaa()">
+💻 کامپیوتر
+</button>
+
+
+</div>
+
+</div>
+
+
+
+
+<script>
+
+function showDevice(){
+
+document.getElementById("deviceBox").style.display="block";
+
+}
+
+
+function goEitaa(){
+
+window.location.href="https://eitaa.com/I_T_MAX";
+
+}
+
+</script>
+
+
+</body>
+</html><!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ایتی مکس | آموزش زبان ایتی</title>
+
+<style>
+
+body {
+    font-family: Tahoma, sans-serif;
+    margin: 0;
+    background: #f2f2f2;
+    text-align: center;
+}
+
+header {
+    background: #2563eb;
+    color: white;
+    padding: 50px 20px;
+}
+
+header h1 {
+    font-size: 40px;
+}
+
+.box {
+    background: white;
+    margin: 25px;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+button, .button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    margin: 10px;
+    font-size: 16px;
+}
+
+button:hover, .button:hover {
+    background: #1e40af;
+}
+
+
+/* پنجره انتخاب دستگاه */
+
+#deviceBox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    padding-top: 120px;
+}
+
+.popup {
+    background: white;
+    width: 300px;
+    margin: auto;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>ایتی مکس</h1>
+
+<p>
+آموزش ساخت زبان ایتی
+</p>
+
+</header>
+
+
+
+<div class="box">
+
+<h2>به ایتی مکس خوش آمدید</h2>
+
+<p>
+ما اینجا به شما رایگان یاد می‌دهیم
+که زبان ایتی را چگونه یاد بگیرید.
+</p>
+
+
+<button onclick="showDevice()">
+شروع آموزش
+</button>
+
+
+</div>
+
+
+
+<div class="box">
+
+<h2>درباره ما</h2>
+
+<p>
+در ایتی مکس آموزش‌های ساده و کاربردی
+برای یادگیری زبان ایتی ارائه می‌شود.
+</p>
+
+</div>
+
+
+
+<div class="box">
+
+<h2>ارتباط با ما</h2>
+
+<p>
+برای دریافت آموزش‌ها وارد کانال ایتای ما شوید.
+</p>
+
+<a class="button" href="https://eitaa.com/I_T_MAX">
+ورود به ایتا
+</a>
+
+</div>
+
+
+
+
+<!-- پنجره انتخاب دستگاه -->
+
+<div id="deviceBox">
+
+<div class="popup">
+
+<h2>
+با چه دستگاهی هستید؟
+</h2>
+
+
+<button onclick="goEitaa()">
+📱 گوشی
+</button>
+
+
+<button onclick="goEitaa()">
+💻 کامپیوتر
+</button>
+
+
+</div>
+
+</div>
+
+
+
+
+<script>
+
+function showDevice(){
+
+document.getElementById("deviceBox").style.display="block";
+
+}
+
+
+function goEitaa(){
+
+window.location.href="https://eitaa.com/I_T_MAX";
+
+}
+
+</script>
 
 
 </body>
