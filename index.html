@@ -158,7 +158,11 @@ button:hover, .button:hover {
 <button onclick="goEitaa()">
 💻 کامپیوتر
 </button>
+<br><br>
 
+<button onclick="closeDevice()">
+⬅️ برگشت
+</button>
 
 </div>
 
@@ -169,17 +173,18 @@ button:hover, .button:hover {
 
 <script>
 
-function showDevice(){
 
-document.getElementById("deviceBox").style.display="block";
 
+function showDevice() {
+    document.getElementById("deviceBox").style.display = "block";
 }
 
+function closeDevice() {
+    document.getElementById("deviceBox").style.display = "none";
+}
 
-function goEitaa(){
-
-window.location.href="https://eitaa.com/I_T_MAX";
-
+function goEitaa() {
+    window.location.href = "https://eitaa.com/I_T_MAX";
 }
 
 </script>
