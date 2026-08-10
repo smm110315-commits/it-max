@@ -1,331 +1,194 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ایتی مکس | آموزش زبان ایتی</title>
+<title>ایتی مکس | آموزش زبان ایتی</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
 
-        body {
-            font-family: Tahoma, Arial, sans-serif;
-            background: #080b18;
-            color: white;
-            line-height: 1.8;
-        }
+body {
+    font-family: Tahoma, sans-serif;
+    margin: 0;
+    background: #f2f2f2;
+    text-align: center;
+}
 
-        /* منوی بالای سایت */
-        nav {
-            background: rgba(10, 15, 35, 0.92);
-            padding: 18px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid #29234d;
-            backdrop-filter: blur(12px);
-        }
+header {
+    background: #2563eb;
+    color: white;
+    padding: 50px 20px;
+}
 
-        .logo {
-            font-size: 26px;
-            font-weight: bold;
-            background: linear-gradient(90deg, #a855f7, #22d3ee);
-            -webkit-background-clip: text;
-            color: transparent;
-        }
+header h1 {
+    font-size: 40px;
+}
 
-        nav a {
-            color: #d7d9e8;
-            text-decoration: none;
-            margin-right: 20px;
-            transition: 0.3s;
-        }
+.box {
+    background: white;
+    margin: 25px;
+    padding: 25px;
+    border-radius: 15px;
+}
 
-        nav a:hover {
-            color: #22d3ee;
-        }
+button, .button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    margin: 10px;
+    font-size: 16px;
+}
 
-        /* صفحه اصلی */
-        .hero {
-            min-height: 78vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 60px 20px;
+button:hover, .button:hover {
+    background: #1e40af;
+}
 
-            background:
-                radial-gradient(circle at 15% 20%, #3b1d70 0%, transparent 35%),
-                radial-gradient(circle at 85% 80%, #064e63 0%, transparent 35%),
-                #080b18;
-        }
 
-        .hero-content {
-            max-width: 800px;
-        }
+/* پنجره انتخاب دستگاه */
 
-        .hero h1 {
-            font-size: 60px;
-            margin-bottom: 15px;
+#deviceBox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    padding-top: 120px;
+}
 
-            background: linear-gradient(90deg, #c084fc, #22d3ee);
-            -webkit-background-clip: text;
-            color: transparent;
-        }
+.popup {
+    background: white;
+    width: 300px;
+    margin: auto;
+    padding: 30px;
+    border-radius: 15px;
+}
 
-        .hero h2 {
-            font-size: 25px;
-            margin-bottom: 20px;
-            color: #ffffff;
-        }
+</style>
 
-        .hero p {
-            color: #b8bfd5;
-            font-size: 18px;
-            margin-bottom: 35px;
-        }
-
-        /* دکمه */
-        .button {
-            display: inline-block;
-            padding: 15px 40px;
-            border-radius: 15px;
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            font-size: 17px;
-
-            background: linear-gradient(90deg, #8b5cf6, #06b6d4);
-
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.35);
-
-            transition: 0.3s;
-        }
-
-        .button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 40px rgba(34, 211, 238, 0.5);
-        }
-
-        /* بخش‌ها */
-        .section {
-            padding: 70px 20px;
-            text-align: center;
-            background: #080b18;
-        }
-
-        .section h2 {
-            font-size: 32px;
-            margin-bottom: 40px;
-
-            background: linear-gradient(90deg, #c084fc, #22d3ee);
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        /* کارت‌های آموزش */
-        .cards {
-            max-width: 1000px;
-            margin: auto;
-
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: rgba(25, 31, 58, 0.8);
-            border: 1px solid #302957;
-            padding: 32px 22px;
-            border-radius: 20px;
-
-            transition: 0.3s;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            border-color: #8b5cf6;
-            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.25);
-        }
-
-        .card h3 {
-            color: #22d3ee;
-            margin-bottom: 12px;
-            font-size: 21px;
-        }
-
-        .card p {
-            color: #b8bfd5;
-        }
-
-        /* درباره ما */
-        .about {
-            max-width: 850px;
-            margin: auto;
-            background: rgba(25, 31, 58, 0.8);
-            border: 1px solid #302957;
-            border-radius: 22px;
-            padding: 40px 25px;
-
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-        }
-
-        .about p {
-            color: #c5c9dc;
-            font-size: 17px;
-            margin-bottom: 25px;
-        }
-
-        /* پایین سایت */
-        footer {
-            text-align: center;
-            padding: 35px 20px;
-            background: #050711;
-            color: #858ba5;
-            border-top: 1px solid #29234d;
-        }
-
-        /* نمایش در موبایل */
-        @media (max-width: 600px) {
-
-            nav {
-                padding: 15px;
-            }
-
-            nav a {
-                margin-right: 8px;
-                font-size: 13px;
-            }
-
-            .hero h1 {
-                font-size: 42px;
-            }
-
-            .hero h2 {
-                font-size: 20px;
-            }
-
-            .hero p {
-                font-size: 16px;
-            }
-
-            .button {
-                padding: 13px 30px;
-            }
-        }
-    </style>
 </head>
+
 
 <body>
 
-    <!-- منوی سایت -->
-    <nav>
-        <div class="logo">ایتی مکس</div>
 
-        <div>
-            <a href="#home">خانه</a>
-            <a href="#courses">آموزش‌ها</a>
-            <a href="#about">درباره ما</a>
-        </div>
-    </nav>
+<header>
 
+<h1>ایتی مکس</h1>
 
-    <!-- صفحه اصلی -->
-    <section class="hero" id="home">
+<p>
+آموزش ساخت زبان ایتی
+</p>
 
-        <div class="hero-content">
-
-            <h1>ایتی مکس</h1>
-
-            <h2>آموزش ساخت و یادگیری زبان ایتی</h2>
-
-            <p>
-                ما اینجا به شما رایگان یاد می‌دهیم
-                که زبان ایتی را چگونه یاد بگیرید.
-            </p>
-
-            <a class="button" href="https://eitaa.com/I_T_MAX">
-                شروع آموزش 🚀
-            </a>
-
-        </div>
-
-    </section>
+</header>
 
 
-    <!-- آموزش‌ها -->
-    <section class="section" id="courses">
 
-        <h2>📚 آموزش‌های ایتی مکس</h2>
+<div class="box">
 
-        <div class="cards">
+<h2>به ایتی مکس خوش آمدید</h2>
 
-            <div class="card">
-                <h3>آموزش مقدماتی</h3>
-                <p>
-                    شروع یادگیری زبان ایتی از پایه.
-                </p>
-            </div>
-
-            <div class="card">
-                <h3>آموزش متوسط</h3>
-                <p>
-                    یادگیری نکات و مهارت‌های کاربردی.
-                </p>
-            </div>
-
-            <div class="card">
-                <h3>آموزش پیشرفته</h3>
-                <p>
-                    یادگیری حرفه‌ای‌تر زبان ایتی.
-                </p>
-            </div>
-
-        </div>
-
-    </section>
+<p>
+ما اینجا به شما رایگان یاد می‌دهیم
+که زبان ایتی را چگونه یاد بگیرید.
+</p>
 
 
-    <!-- درباره ما -->
-    <section class="section" id="about">
-
-        <h2>💜 درباره ایتی مکس</h2>
-
-        <div class="about">
-
-            <p>
-                ایتی مکس یک مجموعه آموزشی برای یادگیری
-                زبان ایتی است.
-                هدف ما این است که آموزش‌ها را ساده،
-                رایگان و قابل فهم ارائه کنیم.
-            </p>
-
-            <a class="button" href="https://eitaa.com/I_T_MAX">
-                ورود به کانال ایتا
-            </a>
-
-        </div>
-
-    </section>
+<button onclick="showDevice()">
+شروع آموزش
+</button>
 
 
-    <!-- پایین سایت -->
-    <footer>
+</div>
 
-        © 2026 ایتی مکس
-        <br>
-        آموزش رایگان زبان ایتی
 
-    </footer>
+
+<div class="box">
+
+<h2>درباره ما</h2>
+
+<p>
+در ایتی مکس آموزش‌های ساده و کاربردی
+برای یادگیری زبان ایتی ارائه می‌شود.
+</p>
+
+</div>
+
+
+
+<div class="box">
+
+<h2>ارتباط با ما</h2>
+
+<p>
+برای دریافت آموزش‌ها وارد کانال ایتای ما شوید.
+</p>
+
+<a class="button" href="https://eitaa.com/I_T_MAX">
+ورود به ایتا
+</a>
+
+</div>
+
+
+
+
+<!-- پنجره انتخاب دستگاه -->
+
+<div id="deviceBox">
+
+<div class="popup">
+
+<h2>
+با چه دستگاهی هستید؟
+</h2>
+
+
+<button onclick="goEitaa()">
+📱 گوشی
+</button>
+
+
+<button onclick="goEitaa()">
+💻 کامپیوتر
+</button>
+<br><br>
+
+<button onclick="closeDevice()">
+⬅️ برگشت
+</button>
+
+</div>
+
+</div>
+
+
+
+
+<script>
+
+
+
+function showDevice() {
+    document.getElementById("deviceBox").style.display = "block";
+}
+
+function closeDevice() {
+    document.getElementById("deviceBox").style.display = "none";
+}
+
+function goEitaa() {
+    window.location.href = "https://eitaa.com/I_T_MAX";
+}
+
+</script>
+
 
 </body>
 </html>
