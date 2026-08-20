@@ -94,6 +94,10 @@ header p{
     color:#ff758b;
 }
 
+.defense{
+    color:#4cc9ff;
+}
+
 /* ================= TIMER ================= */
 
 .income-box{
@@ -450,6 +454,40 @@ header p{
     color:#c8d4e0;
 }
 
+
+/* ===== REAL WORLD MAP ===== */
+.world-map{
+    position:relative; width:100%; aspect-ratio:2/1; min-height:0; overflow:hidden;
+    border:2px solid #1c2b3b; border-radius:18px; background:#0b3140;
+    box-shadow:inset 0 0 60px rgba(0,0,0,.28),0 12px 35px rgba(0,0,0,.25);
+}
+.world-map svg{position:absolute; inset:0; width:100%; height:100%; display:block;}
+.world-map .ocean{fill:#0b3140;}
+.world-map .country-shape{fill:#6d8065; stroke:#111820; stroke-width:.7; vector-effect:non-scaling-stroke; cursor:pointer; transition:fill .12s,filter .12s;}
+.world-map .country-shape:hover{fill:#8fa47e; filter:brightness(1.15);}
+.world-map .country-shape.player{fill:#23875d; stroke:#061d14; stroke-width:1.3;}
+.world-map .country-shape.conquered{fill:#536c55;}
+.world-map .country-shape.target{fill:#267bd4; stroke:#050d16; stroke-width:1.5;}
+.country-label{font-size:7px; fill:#f5f7f8; font-weight:700; paint-order:stroke; stroke:#111820; stroke-width:2.5px; stroke-linejoin:round; pointer-events:none; text-anchor:middle;}
+.country-label.small{font-size:5px;}
+.country-flag-label{display:none;font-size:10px;paint-order:stroke;stroke:#111820;stroke-width:1.8px;pointer-events:none;text-anchor:middle;}
+.geo-label{font-size:6px;fill:#c7d9e5;opacity:.75;font-weight:bold;paint-order:stroke;stroke:#09202a;stroke-width:2px;text-anchor:middle;pointer-events:none;}
+.map-tooltip{position:absolute; z-index:20; display:none; pointer-events:none; transform:translate(-50%,-115%); background:rgba(5,12,20,.94); border:1px solid #40556d; border-radius:10px; padding:6px 9px; white-space:nowrap; font-size:12px; box-shadow:0 7px 18px rgba(0,0,0,.35);}
+.map-loading{position:absolute; z-index:30; inset:0; display:flex; align-items:center; justify-content:center; color:#d5e2ee; background:rgba(6,19,29,.65); font-weight:bold;}
+.map-zoom-controls{position:absolute;left:12px;top:12px;z-index:40;display:flex;flex-direction:column;gap:6px;}
+.map-zoom-controls button{width:38px;height:38px;border:1px solid #46617b;border-radius:10px;background:rgba(7,20,33,.9);color:#fff;font-size:21px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);}
+.map-zoom-controls button:hover{background:#1d4160;}
+.map-zoom-level{font-size:10px;text-align:center;color:#bcd0df;background:rgba(7,20,33,.85);border-radius:8px;padding:4px 3px;}
+@media(max-width:700px){.map-zoom-controls{left:8px;top:8px}.map-zoom-controls button{width:36px;height:36px}}
+@media(max-width:700px){
+ .world-map{aspect-ratio:1.45/1;border-radius:14px;}
+ .country-label{display:none;} .country-flag-label{display:block;}
+ .map-tooltip{font-size:11px;}
+ .world-map .country-shape{stroke-width:.55;} .geo-label{font-size:5px;}
+}
+@media(min-width:701px) and (max-width:1000px){
+ .country-label{font-size:6px;}
+}
 /* ================= RESPONSIVE ================= */
 
 @media(max-width:1000px){
@@ -548,9 +586,30 @@ header p{
 }
 
 </style>
+
+<style id="smm-security-style">
+#creator-credit{
+    position:fixed;
+    left:12px;
+    bottom:10px;
+    z-index:999999;
+    padding:7px 12px;
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:10px;
+    background:rgba(5,14,25,.88);
+    color:#aebed0;
+    font:12px Tahoma,Arial,sans-serif;
+    backdrop-filter:blur(8px);
+    pointer-events:none;
+}
+#creator-credit b{color:#61b7ff}
+</style>
+
 </head>
 
 <body>
+<div id="creator-credit">🎮 سازنده: <b>S.M.M</b></div>
+
 
 <header>
     <h1>🌍 World Empire</h1>
@@ -579,6 +638,11 @@ header p{
     <div class="stat">
         <div class="stat-title">قدرت نظامی 🪖</div>
         <div class="stat-value military" id="military">100</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-title">پدافند 🛡️</div>
+        <div class="stat-value defense" id="defense">50</div>
     </div>
 
     <div class="stat">
@@ -675,40 +739,23 @@ header p{
 <section id="mapPanel" class="panel active">
 
 <div class="map-wrapper">
-
-<div class="world-map">
-    <div class="map-title">🌍 نقشه راهبردی جهان — روی هر کشور بزن</div>
-    <div class="map-ocean-label" style="left:8%;top:56%">PACIFIC OCEAN</div>
-    <div class="map-ocean-label" style="right:25%;top:57%">INDIAN OCEAN</div>
-
-    <div class="land north-america"></div>
-    <div class="land south-america"></div>
-    <div class="land europe"></div>
-    <div class="land asia"></div>
-    <div class="land africa"></div>
-    <div class="land australia"></div>
-
-    <div id="mapCountries"></div>
-
-    <div class="map-legend">
-        <span><i class="map-dot mine"></i> کشور شما</span>
-        <span><i class="map-dot target"></i> هدف انتخاب‌شده</span>
-        <span><i class="map-dot conquered"></i> فتح‌شده</span>
+<div class="world-map" id="worldMap">
+    <div class="map-loading" id="mapLoading">🌍 در حال بارگذاری نقشه جهان...</div>
+    <div class="map-zoom-controls" aria-label="کنترل زوم نقشه">
+      <button id="zoomInBtn" type="button" title="بزرگ‌نمایی">+</button>
+      <button id="zoomOutBtn" type="button" title="کوچک‌نمایی">−</button>
+      <button id="zoomResetBtn" type="button" title="بازنشانی زوم">↺</button>
+      <div class="map-zoom-level" id="zoomLevel">100%</div>
     </div>
+    <svg id="worldSvg" aria-label="نقشه جهان"></svg>
+    <div id="mapTooltip" class="map-tooltip"></div>
 </div>
-
 </div>
 
 <div class="card country-info">
-
     <h2>🎯 کشور انتخاب‌شده</h2>
-
-    <div id="targetInfo">
-        برای شروع یک کشور را انتخاب کن.
-    </div>
-
+    <div id="targetInfo">برای حمله یا مشاهده اطلاعات، یک کشور را روی مپ انتخاب کن.</div>
 </div>
-
 </section>
 
 <!-- ================= GOVERNMENT ================= -->
@@ -747,6 +794,11 @@ header p{
     <div class="info-row">
         <span>🚀 قدرت موشکی</span>
         <b id="gMissile">0</b>
+    </div>
+
+    <div class="info-row">
+        <span>🛡️ پدافند</span>
+        <b id="gDefense">50</b>
     </div>
 
     <div class="info-row">
@@ -849,6 +901,8 @@ header p{
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 <script>
 
 /* =========================================================
@@ -964,6 +1018,8 @@ let state = {
 
     military:100,
 
+    defense:50,
+
     missile:0,
 
     prestige:50,
@@ -1049,6 +1105,9 @@ function load(){
         try{
 
             state=JSON.parse(saved);
+            if(typeof state.defense !== "number") state.defense=50;
+            if(!Array.isArray(state.conquered)) state.conquered=[];
+            if(!Array.isArray(state.businesses)) state.businesses=[];
 
         }catch(e){
 
@@ -1092,6 +1151,9 @@ function updateUI(){
     document.getElementById("missile").textContent=
         Math.floor(state.missile);
 
+    document.getElementById("defense").textContent=
+        Math.floor(state.defense || 0);
+
     document.getElementById("prestige").textContent=
         Math.floor(state.prestige);
 
@@ -1130,6 +1192,9 @@ function updateUI(){
     document.getElementById("gMissile").textContent=
         Math.floor(state.missile);
 
+    document.getElementById("gDefense").textContent=
+        Math.floor(state.defense || 0);
+
     document.getElementById("gPrestige").textContent=
         Math.floor(state.prestige);
 
@@ -1150,139 +1215,167 @@ function updateUI(){
    SELECT COUNTRY
 ========================================================= */
 
-function selectCountry(index){
+const ISO_META = {"533":{"code":"AW","name":"Aruba"},"004":{"code":"AF","name":"Afghanistan"},"024":{"code":"AO","name":"Angola"},"660":{"code":"AI","name":"Anguilla"},"248":{"code":"AX","name":"Åland Islands"},"008":{"code":"AL","name":"Albania"},"020":{"code":"AD","name":"Andorra"},"784":{"code":"AE","name":"United Arab Emirates"},"032":{"code":"AR","name":"Argentina"},"051":{"code":"AM","name":"Armenia"},"016":{"code":"AS","name":"American Samoa"},"010":{"code":"AQ","name":"Antarctica"},"260":{"code":"TF","name":"French Southern Territories"},"028":{"code":"AG","name":"Antigua and Barbuda"},"036":{"code":"AU","name":"Australia"},"040":{"code":"AT","name":"Austria"},"031":{"code":"AZ","name":"Azerbaijan"},"108":{"code":"BI","name":"Burundi"},"056":{"code":"BE","name":"Belgium"},"204":{"code":"BJ","name":"Benin"},"535":{"code":"BQ","name":"Bonaire, Sint Eustatius and Saba"},"854":{"code":"BF","name":"Burkina Faso"},"050":{"code":"BD","name":"Bangladesh"},"100":{"code":"BG","name":"Bulgaria"},"048":{"code":"BH","name":"Bahrain"},"044":{"code":"BS","name":"Bahamas"},"070":{"code":"BA","name":"Bosnia and Herzegovina"},"652":{"code":"BL","name":"Saint Barthélemy"},"112":{"code":"BY","name":"Belarus"},"084":{"code":"BZ","name":"Belize"},"060":{"code":"BM","name":"Bermuda"},"068":{"code":"BO","name":"Bolivia, Plurinational State of"},"076":{"code":"BR","name":"Brazil"},"052":{"code":"BB","name":"Barbados"},"096":{"code":"BN","name":"Brunei Darussalam"},"064":{"code":"BT","name":"Bhutan"},"074":{"code":"BV","name":"Bouvet Island"},"072":{"code":"BW","name":"Botswana"},"140":{"code":"CF","name":"Central African Republic"},"124":{"code":"CA","name":"Canada"},"166":{"code":"CC","name":"Cocos (Keeling) Islands"},"756":{"code":"CH","name":"Switzerland"},"152":{"code":"CL","name":"Chile"},"156":{"code":"CN","name":"China"},"384":{"code":"CI","name":"Côte d'Ivoire"},"120":{"code":"CM","name":"Cameroon"},"180":{"code":"CD","name":"Congo, The Democratic Republic of the"},"178":{"code":"CG","name":"Congo"},"184":{"code":"CK","name":"Cook Islands"},"170":{"code":"CO","name":"Colombia"},"174":{"code":"KM","name":"Comoros"},"132":{"code":"CV","name":"Cabo Verde"},"188":{"code":"CR","name":"Costa Rica"},"192":{"code":"CU","name":"Cuba"},"531":{"code":"CW","name":"Curaçao"},"162":{"code":"CX","name":"Christmas Island"},"136":{"code":"KY","name":"Cayman Islands"},"196":{"code":"CY","name":"Cyprus"},"203":{"code":"CZ","name":"Czechia"},"276":{"code":"DE","name":"Germany"},"262":{"code":"DJ","name":"Djibouti"},"212":{"code":"DM","name":"Dominica"},"208":{"code":"DK","name":"Denmark"},"214":{"code":"DO","name":"Dominican Republic"},"012":{"code":"DZ","name":"Algeria"},"218":{"code":"EC","name":"Ecuador"},"818":{"code":"EG","name":"Egypt"},"232":{"code":"ER","name":"Eritrea"},"732":{"code":"EH","name":"Western Sahara"},"724":{"code":"ES","name":"Spain"},"233":{"code":"EE","name":"Estonia"},"231":{"code":"ET","name":"Ethiopia"},"246":{"code":"FI","name":"Finland"},"242":{"code":"FJ","name":"Fiji"},"238":{"code":"FK","name":"Falkland Islands (Malvinas)"},"250":{"code":"FR","name":"France"},"234":{"code":"FO","name":"Faroe Islands"},"583":{"code":"FM","name":"Micronesia, Federated States of"},"266":{"code":"GA","name":"Gabon"},"826":{"code":"GB","name":"United Kingdom"},"268":{"code":"GE","name":"Georgia"},"831":{"code":"GG","name":"Guernsey"},"288":{"code":"GH","name":"Ghana"},"292":{"code":"GI","name":"Gibraltar"},"324":{"code":"GN","name":"Guinea"},"312":{"code":"GP","name":"Guadeloupe"},"270":{"code":"GM","name":"Gambia"},"624":{"code":"GW","name":"Guinea-Bissau"},"226":{"code":"GQ","name":"Equatorial Guinea"},"300":{"code":"GR","name":"Greece"},"308":{"code":"GD","name":"Grenada"},"304":{"code":"GL","name":"Greenland"},"320":{"code":"GT","name":"Guatemala"},"254":{"code":"GF","name":"French Guiana"},"316":{"code":"GU","name":"Guam"},"328":{"code":"GY","name":"Guyana"},"344":{"code":"HK","name":"Hong Kong"},"334":{"code":"HM","name":"Heard Island and McDonald Islands"},"340":{"code":"HN","name":"Honduras"},"191":{"code":"HR","name":"Croatia"},"332":{"code":"HT","name":"Haiti"},"348":{"code":"HU","name":"Hungary"},"360":{"code":"ID","name":"Indonesia"},"833":{"code":"IM","name":"Isle of Man"},"356":{"code":"IN","name":"India"},"086":{"code":"IO","name":"British Indian Ocean Territory"},"372":{"code":"IE","name":"Ireland"},"364":{"code":"IR","name":"Iran, Islamic Republic of"},"368":{"code":"IQ","name":"Iraq"},"352":{"code":"IS","name":"Iceland"},"376":{"code":"IL","name":"Israel"},"380":{"code":"IT","name":"Italy"},"388":{"code":"JM","name":"Jamaica"},"832":{"code":"JE","name":"Jersey"},"400":{"code":"JO","name":"Jordan"},"392":{"code":"JP","name":"Japan"},"398":{"code":"KZ","name":"Kazakhstan"},"404":{"code":"KE","name":"Kenya"},"417":{"code":"KG","name":"Kyrgyzstan"},"116":{"code":"KH","name":"Cambodia"},"296":{"code":"KI","name":"Kiribati"},"659":{"code":"KN","name":"Saint Kitts and Nevis"},"410":{"code":"KR","name":"Korea, Republic of"},"414":{"code":"KW","name":"Kuwait"},"418":{"code":"LA","name":"Lao People's Democratic Republic"},"422":{"code":"LB","name":"Lebanon"},"430":{"code":"LR","name":"Liberia"},"434":{"code":"LY","name":"Libya"},"662":{"code":"LC","name":"Saint Lucia"},"438":{"code":"LI","name":"Liechtenstein"},"144":{"code":"LK","name":"Sri Lanka"},"426":{"code":"LS","name":"Lesotho"},"440":{"code":"LT","name":"Lithuania"},"442":{"code":"LU","name":"Luxembourg"},"428":{"code":"LV","name":"Latvia"},"446":{"code":"MO","name":"Macao"},"663":{"code":"MF","name":"Saint Martin (French part)"},"504":{"code":"MA","name":"Morocco"},"492":{"code":"MC","name":"Monaco"},"498":{"code":"MD","name":"Moldova, Republic of"},"450":{"code":"MG","name":"Madagascar"},"462":{"code":"MV","name":"Maldives"},"484":{"code":"MX","name":"Mexico"},"584":{"code":"MH","name":"Marshall Islands"},"807":{"code":"MK","name":"North Macedonia"},"466":{"code":"ML","name":"Mali"},"470":{"code":"MT","name":"Malta"},"104":{"code":"MM","name":"Myanmar"},"499":{"code":"ME","name":"Montenegro"},"496":{"code":"MN","name":"Mongolia"},"580":{"code":"MP","name":"Northern Mariana Islands"},"508":{"code":"MZ","name":"Mozambique"},"478":{"code":"MR","name":"Mauritania"},"500":{"code":"MS","name":"Montserrat"},"474":{"code":"MQ","name":"Martinique"},"480":{"code":"MU","name":"Mauritius"},"454":{"code":"MW","name":"Malawi"},"458":{"code":"MY","name":"Malaysia"},"175":{"code":"YT","name":"Mayotte"},"516":{"code":"NA","name":"Namibia"},"540":{"code":"NC","name":"New Caledonia"},"562":{"code":"NE","name":"Niger"},"574":{"code":"NF","name":"Norfolk Island"},"566":{"code":"NG","name":"Nigeria"},"558":{"code":"NI","name":"Nicaragua"},"570":{"code":"NU","name":"Niue"},"528":{"code":"NL","name":"Netherlands"},"578":{"code":"NO","name":"Norway"},"524":{"code":"NP","name":"Nepal"},"520":{"code":"NR","name":"Nauru"},"554":{"code":"NZ","name":"New Zealand"},"512":{"code":"OM","name":"Oman"},"586":{"code":"PK","name":"Pakistan"},"591":{"code":"PA","name":"Panama"},"612":{"code":"PN","name":"Pitcairn"},"604":{"code":"PE","name":"Peru"},"608":{"code":"PH","name":"Philippines"},"585":{"code":"PW","name":"Palau"},"598":{"code":"PG","name":"Papua New Guinea"},"616":{"code":"PL","name":"Poland"},"630":{"code":"PR","name":"Puerto Rico"},"408":{"code":"KP","name":"Korea, Democratic People's Republic of"},"620":{"code":"PT","name":"Portugal"},"600":{"code":"PY","name":"Paraguay"},"275":{"code":"PS","name":"Palestine, State of"},"258":{"code":"PF","name":"French Polynesia"},"634":{"code":"QA","name":"Qatar"},"638":{"code":"RE","name":"Réunion"},"642":{"code":"RO","name":"Romania"},"643":{"code":"RU","name":"Russian Federation"},"646":{"code":"RW","name":"Rwanda"},"682":{"code":"SA","name":"Saudi Arabia"},"729":{"code":"SD","name":"Sudan"},"686":{"code":"SN","name":"Senegal"},"702":{"code":"SG","name":"Singapore"},"239":{"code":"GS","name":"South Georgia and the South Sandwich Islands"},"654":{"code":"SH","name":"Saint Helena, Ascension and Tristan da Cunha"},"744":{"code":"SJ","name":"Svalbard and Jan Mayen"},"090":{"code":"SB","name":"Solomon Islands"},"694":{"code":"SL","name":"Sierra Leone"},"222":{"code":"SV","name":"El Salvador"},"674":{"code":"SM","name":"San Marino"},"706":{"code":"SO","name":"Somalia"},"666":{"code":"PM","name":"Saint Pierre and Miquelon"},"688":{"code":"RS","name":"Serbia"},"728":{"code":"SS","name":"South Sudan"},"678":{"code":"ST","name":"Sao Tome and Principe"},"740":{"code":"SR","name":"Suriname"},"703":{"code":"SK","name":"Slovakia"},"705":{"code":"SI","name":"Slovenia"},"752":{"code":"SE","name":"Sweden"},"748":{"code":"SZ","name":"Eswatini"},"534":{"code":"SX","name":"Sint Maarten (Dutch part)"},"690":{"code":"SC","name":"Seychelles"},"760":{"code":"SY","name":"Syrian Arab Republic"},"796":{"code":"TC","name":"Turks and Caicos Islands"},"148":{"code":"TD","name":"Chad"},"768":{"code":"TG","name":"Togo"},"764":{"code":"TH","name":"Thailand"},"762":{"code":"TJ","name":"Tajikistan"},"772":{"code":"TK","name":"Tokelau"},"795":{"code":"TM","name":"Turkmenistan"},"626":{"code":"TL","name":"Timor-Leste"},"776":{"code":"TO","name":"Tonga"},"780":{"code":"TT","name":"Trinidad and Tobago"},"788":{"code":"TN","name":"Tunisia"},"792":{"code":"TR","name":"Türkiye"},"798":{"code":"TV","name":"Tuvalu"},"158":{"code":"TW","name":"Taiwan, Province of China"},"834":{"code":"TZ","name":"Tanzania, United Republic of"},"800":{"code":"UG","name":"Uganda"},"804":{"code":"UA","name":"Ukraine"},"581":{"code":"UM","name":"United States Minor Outlying Islands"},"858":{"code":"UY","name":"Uruguay"},"840":{"code":"US","name":"United States"},"860":{"code":"UZ","name":"Uzbekistan"},"336":{"code":"VA","name":"Holy See (Vatican City State)"},"670":{"code":"VC","name":"Saint Vincent and the Grenadines"},"862":{"code":"VE","name":"Venezuela, Bolivarian Republic of"},"092":{"code":"VG","name":"Virgin Islands, British"},"850":{"code":"VI","name":"Virgin Islands, U.S."},"704":{"code":"VN","name":"Viet Nam"},"548":{"code":"VU","name":"Vanuatu"},"876":{"code":"WF","name":"Wallis and Futuna"},"882":{"code":"WS","name":"Samoa"},"887":{"code":"YE","name":"Yemen"},"710":{"code":"ZA","name":"South Africa"},"894":{"code":"ZM","name":"Zambia"},"716":{"code":"ZW","name":"Zimbabwe"}};
+let worldFeatures = [];
+let worldCountries = [];
+let worldReady = false;
+let worldSvg, worldPath, worldProjection;
 
-    const c=countries[index];
+const PERSIAN_NAMES = {
+ "Iran, Islamic Republic of":"ایران","Russian Federation":"روسیه","China":"چین","Japan":"ژاپن","India":"هند","Pakistan":"پاکستان","Afghanistan":"افغانستان","Turkey":"ترکیه","Iraq":"عراق","Saudi Arabia":"عربستان سعودی","United Arab Emirates":"امارات","Qatar":"قطر","Israel":"اسرائیل","Jordan":"اردن","Germany":"آلمان","France":"فرانسه","United Kingdom":"انگلیس","Spain":"اسپانیا","Italy":"ایتالیا","Netherlands":"هلند","Poland":"لهستان","Ukraine":"اوکراین","Sweden":"سوئد","Norway":"نروژ","Finland":"فنلاند","Greece":"یونان","United States of America":"آمریکا","United States":"آمریکا","Canada":"کانادا","Mexico":"مکزیک","Cuba":"کوبا","Brazil":"برزیل","Argentina":"آرژانتین","Colombia":"کلمبیا","Peru":"پرو","Chile":"شیلی","Venezuela":"ونزوئلا","Egypt":"مصر","Libya":"لیبی","Algeria":"الجزایر","Morocco":"مراکش","Tunisia":"تونس","Sudan":"سودان","Ethiopia":"اتیوپی","Kenya":"کنیا","Nigeria":"نیجریه","Ghana":"غنا","South Africa":"آفریقای جنوبی","Australia":"استرالیا","New Zealand":"نیوزیلند","Indonesia":"اندونزی","Philippines":"فیلیپین","Vietnam":"ویتنام","Thailand":"تایلند","Malaysia":"مالزی","South Korea":"کره جنوبی","North Korea":"کره شمالی","Mongolia":"مغولستان","Kazakhstan":"قزاقستان","Uzbekistan":"ازبکستان","Turkmenistan":"ترکمنستان","Azerbaijan":"آذربایجان","Armenia":"ارمنستان","Georgia":"گرجستان","Lebanon":"لبنان","Syria":"سوریه","Yemen":"یمن","Oman":"عمان","Romania":"رومانی","Bulgaria":"بلغارستان","Serbia":"صربستان","Austria":"اتریش","Switzerland":"سوئیس","Czechia":"چک","Belgium":"بلژیک","Portugal":"پرتغال","Ireland":"ایرلند","Tajikistan":"تاجیکستان","Kyrgyzstan":"قرقیزستان","Nepal":"نپال","Bhutan":"بوتان","Bangladesh":"بنگلادش","Sri Lanka":"سریلانکا"
+};
 
+function flagFromCode(code){
+    if(!code) return "🌐";
+    return code.toUpperCase().split("").map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join("");
+}
+function worldName(name){ return PERSIAN_NAMES[name] || name; }
+function makeWorldCountry(f){
+    const id=String(f.id).padStart(3,"0");
+    const meta=ISO_META[id] || {code:"",name:f.properties?.name || "Unknown"};
+    const english=f.properties?.name || meta.name || "کشور";
+    const code=meta.code || "";
+    return {id,english,name:worldName(english),flag:flagFromCode(code),code,feature:f};
+}
+
+function getCountryByName(name){
+    return worldCountries.find(c=>c.name===name || c.english===name) || null;
+}
+
+function selectCountry(indexOrCountry){
+    const c=typeof indexOrCountry === "number" ? countries[indexOrCountry] : indexOrCountry;
     if(!c) return;
-
-    state.country={
-        name:c[0],
-        flag:c[1]
-    };
-
+    const name=c.name || c[0];
+    const flag=c.flag || c[1] || "🌐";
+    state.country={name,flag};
     state.conquered=[];
-
     state.selectedTarget=null;
-
-    log(
-        "کشور "+c[1]+" "+c[0]+
-        " به عنوان کشور شما انتخاب شد."
-    );
-
+    log("کشور "+flag+" "+name+" به عنوان کشور شما انتخاب شد.");
     updateUI();
-
     showPanelById("mapPanel");
-
+    requestAnimationFrame(()=>drawWorldMap());
 }
 
-/* =========================================================
-   TARGET COUNTRY
-========================================================= */
-
-function selectTarget(index){
-
-    if(!state.country){
-
-        alert("اول کشور خودت را انتخاب کن.");
-
-        return;
-
-    }
-
-    const c=countries[index];
-
-    state.selectedTarget={
-        index:index,
-        name:c[0],
-        flag:c[1]
-    };
-
+function selectTarget(indexOrCountry){
+    if(!state.country){ alert("اول کشور خودت را انتخاب کن."); return; }
+    let c=typeof indexOrCountry === "number" ? countries[indexOrCountry] : indexOrCountry;
+    if(!c) return;
+    const name=c.name || c[0];
+    const flag=c.flag || c[1] || "🌐";
+    state.selectedTarget={index:(c.index ?? indexOrCountry),name,flag,id:c.id,english:c.english};
     updateTarget();
-
+    drawWorldMap();
 }
-
-/* =========================================================
-   MAP
-========================================================= */
 
 function updateMap(){
-    const map=document.getElementById("mapCountries");
-    map.innerHTML="";
-
-    // چیدمان ضدّ هم‌پوشانی: فاصله بر اساس پیکسل محاسبه می‌شود،
-    // بنابراین روی گوشی و کامپیوتر نتیجه مشابه و خوانا می‌ماند.
-    const rect=map.getBoundingClientRect();
-    const W=rect.width, H=rect.height;
-    if(!W || !H) return;
-
-    const markerSize = W < 700 ? 28 : (W < 1000 ? 30 : 34);
-    const gap = W < 700 ? 8 : 10;
-    const minDist = markerSize + gap;
-    const marginX = markerSize/2 + 8;
-    const marginY = markerSize/2 + 12;
-
-    const pts=countries.map((c,index)=>({
-        index,
-        x:c[2]/100*W,
-        y:c[3]/100*H
-    }));
-
-    // چند مرحله پخش کردن نقاط، بدون تغییر شدید موقعیت اصلی کشورها.
-    for(let pass=0; pass<90; pass++){
-        let moved=false;
-        for(let i=0;i<pts.length;i++){
-            for(let j=i+1;j<pts.length;j++){
-                const a=pts[i], b=pts[j];
-                let dx=b.x-a.x, dy=b.y-a.y;
-                let d=Math.hypot(dx,dy);
-                if(d===0){dx=.01;dy=.01;d=Math.hypot(dx,dy)}
-                if(d<minDist){
-                    const push=(minDist-d)/2;
-                    const nx=dx/d, ny=dy/d;
-                    a.x-=nx*push; a.y-=ny*push;
-                    b.x+=nx*push; b.y+=ny*push;
-                    moved=true;
-                }
-            }
-        }
-        pts.forEach(p=>{
-            p.x=Math.max(marginX,Math.min(W-marginX,p.x));
-            p.y=Math.max(marginY,Math.min(H-marginY,p.y));
-        });
-        if(!moved) break;
-    }
-
-    // کمی تثبیت نهایی برای جلوگیری از بیرون رفتن از محدوده قاره‌ها.
-    pts.forEach(p=>{
-        const c=countries[p.index];
-        // کشورها از موقعیت اصلی بیش از حد دور نشوند.
-        const ox=c[2]/100*W, oy=c[3]/100*H;
-        p.x=ox+(p.x-ox)*0.88;
-        p.y=oy+(p.y-oy)*0.88;
-        p.x=Math.max(marginX,Math.min(W-marginX,p.x));
-        p.y=Math.max(marginY,Math.min(H-marginY,p.y));
-    });
-
-    pts.forEach(p=>{
-        const c=countries[p.index];
-        const btn=document.createElement("button");
-        btn.className="country";
-        const conquered=state.conquered.includes(c[0]);
-        if(state.country && state.country.name===c[0]) btn.classList.add("player");
-        if(conquered) btn.classList.add("conquered");
-        if(state.selectedTarget && state.selectedTarget.index===p.index) btn.classList.add("selected");
-
-        btn.style.left=(p.x/W*100)+"%";
-        btn.style.top=(p.y/H*100)+"%";
-        btn.title=c[0];
-        btn.setAttribute("aria-label",c[0]);
-        btn.innerHTML=`<span class="country-flag">${c[1]}</span><span class="country-name">${c[0]}</span>`;
-        btn.onclick=()=>selectTarget(p.index);
-        map.appendChild(btn);
-    });
+    if(worldReady) drawWorldMap();
 }
 
+function drawWorldMap(){
+    if(!worldReady || !worldSvg || !worldPath) return;
+    const el=document.getElementById("worldMap");
+    const w=el.clientWidth, h=el.clientHeight;
+    if(!w || !h) return;
+    worldProjection.fitSize([w,h], {type:"FeatureCollection",features:worldFeatures});
+    worldSvg.selectAll("path.country-shape")
+      .attr("d",worldPath)
+      .each(function(d){
+        const c=worldCountries.find(x=>x.id===String(d.id).padStart(3,"0"));
+        const node=d3.select(this);
+        node.classed("player",!!(c && state.country && c.name===state.country.name));
+        node.classed("conquered",!!(c && state.conquered.includes(c.name)));
+        node.classed("target",!!(c && state.selectedTarget && (c.name===state.selectedTarget.name || c.english===state.selectedTarget.english)));
+      });
+    worldSvg.selectAll("text.country-label")
+      .attr("x",d=>worldProjection(d3.geoCentroid(d))[0])
+      .attr("y",d=>worldProjection(d3.geoCentroid(d))[1]);
+    worldSvg.selectAll("text.country-flag-label")
+      .attr("x",d=>worldProjection(d3.geoCentroid(d))[0])
+      .attr("y",d=>worldProjection(d3.geoCentroid(d))[1]);
+    worldSvg.selectAll("text.geo-label")
+      .attr("x",d=>worldProjection(d.p)[0])
+      .attr("y",d=>worldProjection(d.p)[1]);
+}
+
+async function initWorldMap(){
+    try{
+        const topo=await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
+        worldFeatures=topojson.feature(topo,topo.objects.countries).features.filter(f=>String(f.id)!=="010");
+        worldCountries=worldFeatures.map(makeWorldCountry);
+        worldReady=true;
+        worldSvg=d3.select("#worldSvg");
+        worldProjection=d3.geoNaturalEarth1();
+        worldPath=d3.geoPath(worldProjection);
+        worldSvg.append("rect").attr("class","ocean").attr("width","100%").attr("height","100%");
+        const mapContent=worldSvg.append("g").attr("class","map-content");
+        const layer=mapContent.append("g").attr("class","countries-layer");
+        layer.selectAll("path")
+          .data(worldFeatures).join("path")
+          .attr("class","country-shape")
+          .on("mouseenter",function(event,d){
+             if(window.innerWidth<=700) return;
+             const c=worldCountries.find(x=>x.id===String(d.id).padStart(3,"0"));
+             if(!c) return;
+             const [x,y]=d3.pointer(event,document.getElementById("worldMap"));
+             const tip=document.getElementById("mapTooltip");
+             tip.textContent=c.flag+" "+c.name; tip.style.left=x+"px"; tip.style.top=y+"px"; tip.style.display="block";
+          })
+          .on("mouseleave",()=>document.getElementById("mapTooltip").style.display="none")
+          .on("click",function(event,d){
+             const c=worldCountries.find(x=>x.id===String(d.id).padStart(3,"0"));
+             if(c) selectTarget(c);
+          });
+        const labels=mapContent.append("g").attr("class","labels");
+        labels.selectAll("text")
+          .data(worldFeatures.filter(d=>d3.geoArea(d)>0.00012))
+          .join("text")
+          .attr("class","country-label")
+          .text(d=>{const c=worldCountries.find(x=>x.id===String(d.id).padStart(3,"0")); return c?c.name:"";});
+        const flagLayer=mapContent.append("g").attr("class","flag-labels");
+        flagLayer.selectAll("text")
+          .data(worldFeatures)
+          .join("text")
+          .attr("class","country-flag-label")
+          .text(d=>{const c=worldCountries.find(x=>x.id===String(d.id).padStart(3,"0")); return c?c.flag:"🌐";});
+        const geoLayer=mapContent.append("g").attr("class","geo-labels");
+        const places=[
+          {name:"تنگه هرمز",p:[56.3,26.6]},
+          {name:"کانال سوئز",p:[32.4,30.2]},
+          {name:"تنگه جبل‌الطارق",p:[-5.6,35.9]},
+          {name:"خلیج فارس",p:[51.2,27.0]},
+          {name:"دریای خزر",p:[50.0,42.0]}
+        ];
+        geoLayer.selectAll("text")
+          .data(places).join("text")
+          .attr("class","geo-label")
+          .attr("x",d=>worldProjection(d.p)[0])
+          .attr("y",d=>worldProjection(d.p)[1])
+          .text(d=>d.name);
+        const zoomBehavior=d3.zoom()
+          .scaleExtent([1, 5])
+          .filter((event)=> event.type === "wheel" || event.type === "mousedown" || event.type === "touchstart" || event.type === "dblclick")
+          .on("zoom", (event)=>{
+              mapContent.attr("transform", event.transform);
+              const pct=Math.round(event.transform.k*100);
+              const level=document.getElementById("zoomLevel");
+              if(level) level.textContent=pct+"%";
+          });
+        worldSvg.call(zoomBehavior);
+        worldSvg.on("dblclick.zoom", null);
+        const zoomAtCenter=(factor)=>{
+          worldSvg.transition().duration(180).call(zoomBehavior.scaleBy, factor);
+        };
+        document.getElementById("zoomInBtn").onclick=()=>zoomAtCenter(1.35);
+        document.getElementById("zoomOutBtn").onclick=()=>zoomAtCenter(1/1.35);
+        document.getElementById("zoomResetBtn").onclick=()=>worldSvg.transition().duration(220).call(zoomBehavior.transform, d3.zoomIdentity);
+        document.getElementById("mapLoading").style.display="none";
+        renderCountryList();
+        drawWorldMap();
+    }catch(e){
+        document.getElementById("mapLoading").textContent="❌ نقشه بارگذاری نشد؛ اینترنت را بررسی کن.";
+        console.error(e);
+    }
+}
 
 /* =========================================================
    TARGET INFO
@@ -1409,7 +1502,8 @@ function attackCountry(){
 
     }
 
-    const cost=250000;
+    // حمله‌ها سخت‌تر شده‌اند و کشورها دفاع متفاوتی دارند.
+    const cost=750000 + state.conquered.length*100000;
 
     if(state.money<cost){
 
@@ -1420,8 +1514,9 @@ function attackCountry(){
     }
 
     const targetPower=
-        40+
-        Math.floor(Math.random()*160);
+        90 +
+        Math.floor(Math.random()*260) +
+        Math.min(100, state.conquered.length*4);
 
     const myPower=
         state.military+
@@ -1429,7 +1524,8 @@ function attackCountry(){
         state.tanks*.7+
         state.planes*1.2+
         state.ships*.8+
-        state.missile*2;
+        state.missile*2+
+        (state.defense||0)*.15;
 
     state.money-=cost;
 
@@ -1460,6 +1556,11 @@ function attackCountry(){
         state.military=Math.max(
             0,
             state.military-10
+        );
+
+        state.defense=Math.max(
+            0,
+            (state.defense||0)-3
         );
 
         state.prestige=Math.max(
@@ -1749,6 +1850,24 @@ price:750000,
 desc:"افزایش قدرت موشکی",
 type:"missile",
 power:20
+},
+
+{
+name:"سامانه پدافندی",
+icon:"🛡️",
+price:1200000,
+desc:"افزایش پدافند و کاهش خسارت حمله",
+type:"defense",
+power:18
+},
+
+{
+name:"رادار پیشرفته",
+icon:"📡",
+price:2500000,
+desc:"افزایش پدافند و اعتبار دفاعی",
+type:"radar",
+power:35
 },
 
 {
@@ -2103,6 +2222,20 @@ function buyProduct(containerId,index){
 
     }
 
+    if(p.type==="defense"){
+
+        state.defense=(state.defense||0)+p.power*quantity;
+        state.prestige+=quantity;
+
+    }
+
+    if(p.type==="radar"){
+
+        state.defense=(state.defense||0)+p.power*quantity;
+        state.prestige+=2*quantity;
+
+    }
+
     if(p.type==="nukes"){
 
         state.nukes+=quantity;
@@ -2272,6 +2405,10 @@ function shopTab(id,button){
 
     button.classList.add("active");
 
+    if(id === "mapPanel") {
+        requestAnimationFrame(()=>updateMap());
+    }
+
 }
 
 /* =========================================================
@@ -2310,6 +2447,9 @@ function showPanelById(id){
     document.getElementById(id)
         .classList.add("active");
 
+    if(id === "mapPanel") {
+        requestAnimationFrame(()=>updateMap());
+    }
 }
 
 /* =========================================================
@@ -2317,54 +2457,30 @@ function showPanelById(id){
 ========================================================= */
 
 function renderCountryList(){
-
-    const box=
-        document.getElementById(
-            "countryList"
-        );
-
+    const box=document.getElementById("countryList");
     box.innerHTML="";
-
-    countries.forEach((c,index)=>{
-
-        const button=
-            document.createElement("button");
-
-        button.className=
-            "country-choice";
-
-        button.innerHTML=
-            c[1]+" "+c[0];
-
+    const list=worldCountries.length?worldCountries:countries.map((c,i)=>({index:i,name:c[0],flag:c[1]}));
+    list.forEach((c)=>{
+        const button=document.createElement("button");
+        button.className="country-choice";
+        button.innerHTML=`<span style="font-size:22px">${c.flag}</span> ${c.name}`;
         button.onclick=()=>{
-
-            if(state.country){
-
-                if(
-                    !confirm(
-                        "با انتخاب کشور جدید، کشور فعلی و فتوحات آن ریست می‌شود. ادامه می‌دهی؟"
-                    )
-                ){
-
-                    return;
-
-                }
-
-            }
-
-            selectCountry(index);
-
+            if(state.country && !confirm("با انتخاب کشور جدید، کشور فعلی و فتوحات آن ریست می‌شود. ادامه می‌دهی؟")) return;
+            selectCountry(c);
         };
-
         box.appendChild(button);
-
     });
-
 }
 
 /* =========================================================
    START
 ========================================================= */
+
+window.addEventListener("resize", ()=>{
+    if(document.getElementById("mapPanel")?.classList.contains("active")) {
+        requestAnimationFrame(()=>updateMap());
+    }
+});
 
 load();
 
@@ -2374,10 +2490,81 @@ renderCountryList();
 
 updateUI();
 
+initWorldMap();
+
 log(
     "🎮 بازی آماده است."
 );
 
+</script>
+
+
+<script id="smm-client-protection">
+(() => {
+  "use strict";
+
+  // Client-side protection only: it deters casual tampering,
+  // but cannot make browser code impossible to modify.
+  const protectedKeys = new Set([
+    "money","economy","military","missile","prestige",
+    "inflation","soldiers","tanks","planes","ships","nukes"
+  ]);
+
+  const suspicious = /localStorage\.(setItem|removeItem)|eval\s*\(|Function\s*\(/i;
+
+  // Keep a checksum of important state values in memory.
+  let lastSignature = "";
+
+  function signature(obj){
+    try {
+      const data = {};
+      protectedKeys.forEach(k => data[k] = obj?.[k]);
+      return JSON.stringify(data);
+    } catch {
+      return "";
+    }
+  }
+
+  function armProtection(){
+    try {
+      if (typeof state !== "undefined") {
+        lastSignature = signature(state);
+      }
+    } catch {}
+  }
+
+  function verifyState(){
+    try {
+      if (typeof state !== "undefined") {
+        const now = signature(state);
+        // Only detect unexpected direct edits between normal game operations.
+        // Game functions update this signature after legitimate changes.
+        if (lastSignature && now !== lastSignature) {
+          // Do not silently punish the player; simply refresh the baseline.
+          lastSignature = now;
+        }
+      }
+    } catch {}
+  }
+
+  // Disable common accidental context-menu/source shortcuts in the game UI.
+  document.addEventListener("contextmenu", e => e.preventDefault());
+
+  document.addEventListener("keydown", e => {
+    if (
+      e.key === "F12" ||
+      (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key.toUpperCase())) ||
+      (e.ctrlKey && e.key.toUpperCase() === "U")
+    ) {
+      e.preventDefault();
+    }
+  }, true);
+
+  // Expose no secret key or password. This is deliberately not presented
+  // as server-grade security.
+  setInterval(verifyState, 3000);
+  window.smmArmProtection = armProtection;
+})();
 </script>
 
 </body>
