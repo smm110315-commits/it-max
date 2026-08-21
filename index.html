@@ -606,77 +606,22 @@ header p{
 </style>
 
 
-<style id="smm-mobile-map-fix">
-/* Mobile map: prevent country markers from overlapping */
-@media (max-width: 700px) {
-  .world-map {
-    min-height: 520px !important;
-    aspect-ratio: auto !important;
-    overflow: hidden !important;
-    touch-action: pan-x pan-y pinch-zoom;
-  }
 
-  .country {
-    min-width: 34px !important;
-    width: 34px !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    padding: 0 !important;
-    border-radius: 50% !important;
-    font-size: 0 !important;
-    line-height: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    overflow: hidden !important;
-  }
 
-  .country::first-letter {
-    font-size: 20px;
-  }
 
-  .country.selected {
-    width: 42px !important;
-    height: 42px !important;
-    min-width: 42px !important;
-    min-height: 42px !important;
-    z-index: 50 !important;
-    font-size: 0 !important;
-  }
 
-  .country.player {
-    z-index: 45 !important;
-  }
 
-  .country:hover {
-    transform: translate(-50%, -50%) scale(1.05) !important;
-  }
 
-  #mapCountries {
-    position: absolute;
-    inset: 0;
-  }
-}
 
-/* Very small phones */
-@media (max-width: 390px) {
-  .world-map {
-    min-height: 560px !important;
-  }
 
-  .country {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    min-height: 30px !important;
-  }
 
-  .country::first-letter {
-    font-size: 18px;
-  }
+<style id="smm-final-map-ui">
+.world-map .country-label{display:none!important;}
+.world-map .country-flag-label{display:none!important;}
+@media(max-width:700px){
+ .world-map .country-flag-label.smm-active{display:block!important;font-size:15px!important;paint-order:stroke;stroke:#111820;stroke-width:2px;}
 }
 </style>
-
 </head>
 
 <body>
@@ -1360,10 +1305,18 @@ function drawWorldMap(){
       });
     worldSvg.selectAll("text.country-label")
       .attr("x",d=>worldProjection(d3.geoCentroid(d))[0])
-      .attr("y",d=>worldProjection(d3.geoCentroid(d))[1]);
+      .attr("y",d=>worldProjection(d3.geoCentroid(d))[1])
+      .style("display","none");
     worldSvg.selectAll("text.country-flag-label")
       .attr("x",d=>worldProjection(d3.geoCentroid(d))[0])
-      .attr("y",d=>worldProjection(d3.geoCentroid(d))[1]);
+      .attr("y",d=>worldProjection(d3.geoCentroid(d))[1])
+      .classed("smm-active", d=>{
+        if(window.innerWidth>700) return false;
+        const c=worldCountries.find(x=>x.id===String(d.id).padStart(3,"0"));
+        if(!c) return false;
+        return !!(state.country && c.name===state.country.name) ||
+               !!(state.selectedTarget && (c.name===state.selectedTarget.name || c.english===state.selectedTarget.english));
+      });
     worldSvg.selectAll("text.geo-label")
       .attr("x",d=>worldProjection(d.p)[0])
       .attr("y",d=>worldProjection(d.p)[1]);
@@ -2640,87 +2593,13 @@ log(
 </script>
 
 
-<script id="smm-mobile-map-layout">
-(() => {
-  function spreadMobileMarkers() {
-    if (window.innerWidth > 700) return;
 
-    const map = document.querySelector(".world-map");
-    const markers = [...document.querySelectorAll(".world-map .country")];
-    if (!map || !markers.length) return;
 
-    const w = map.clientWidth;
-    const h = map.clientHeight;
 
-    // Minimum separation in pixels on phones.
-    const minDistance = window.innerWidth <= 390 ? 38 : 44;
 
-    const points = markers.map(el => ({
-      el,
-      x: parseFloat(el.style.left) / 100 * w,
-      y: parseFloat(el.style.top) / 100 * h
-    }));
 
-    // A few relaxation passes move nearby markers apart while
-    // keeping them close to their original geographic positions.
-    for (let pass = 0; pass < 12; pass++) {
-      for (let i = 0; i < points.length; i++) {
-        for (let j = i + 1; j < points.length; j++) {
-          let dx = points[j].x - points[i].x;
-          let dy = points[j].y - points[i].y;
-          let d = Math.hypot(dx, dy);
 
-          if (d < minDistance) {
-            if (d < 0.1) {
-              dx = 1;
-              dy = 0;
-              d = 1;
-            }
 
-            const push = (minDistance - d) / 2;
-            const nx = dx / d;
-            const ny = dy / d;
-
-            points[i].x -= nx * push;
-            points[i].y -= ny * push;
-            points[j].x += nx * push;
-            points[j].y += ny * push;
-          }
-        }
-      }
-    }
-
-    points.forEach(p => {
-      const margin = 18;
-      p.x = Math.max(margin, Math.min(w - margin, p.x));
-      p.y = Math.max(margin, Math.min(h - margin, p.y));
-      p.el.style.left = p.x + "px";
-      p.el.style.top = p.y + "px";
-    });
-  }
-
-  let timer = null;
-  function refresh() {
-    clearTimeout(timer);
-    timer = setTimeout(spreadMobileMarkers, 80);
-  }
-
-  window.addEventListener("resize", refresh);
-  window.addEventListener("orientationchange", refresh);
-
-  // Run after the game's initial map render and after navigation back to map.
-  const oldUpdateMap = window.updateMap;
-  if (typeof oldUpdateMap === "function") {
-    window.updateMap = function() {
-      oldUpdateMap.apply(this, arguments);
-      refresh();
-    };
-  }
-
-  setTimeout(spreadMobileMarkers, 300);
-  setTimeout(spreadMobileMarkers, 1000);
-})();
-</script>
 
 </body>
 </html>
